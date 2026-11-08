@@ -1,4 +1,4 @@
-import { IMPOSTER_COUNT, PLAYER_COUNT } from '@/data/constants';
+import { IMPOSTER_COUNT, PLAYER_COUNT, PLAYER_NAME_MAX_LENGTH } from '@/data/constants';
 import {
   GAME_PHASE,
   RANDOM_CATEGORY,
@@ -7,6 +7,7 @@ import {
   type GamePhase,
   type GameSession,
 } from '@/types/game';
+import { resizePlayerNames } from './players';
 import { getMaxImposters } from './roles';
 
 export type GameAction =
@@ -14,6 +15,7 @@ export type GameAction =
   | { type: 'SET_IMPOSTER_COUNT'; imposterCount: number }
   | { type: 'SET_CATEGORY'; categoryId: CategorySelection }
   | { type: 'SET_HINT_ENABLED'; isHintEnabled: boolean }
+  | { type: 'SET_PLAYER_NAME'; index: number; name: string }
   | { type: 'BEGIN_HANDOFF'; session: GameSession }
   | { type: 'ADVANCE_PLAYER' }
   | { type: 'END_GAME' }
@@ -28,6 +30,7 @@ export function createInitialState(): GameEngineState {
       imposterCount: IMPOSTER_COUNT.DEFAULT,
       categoryId: RANDOM_CATEGORY,
       isHintEnabled: true,
+      playerNames: resizePlayerNames([], PLAYER_COUNT.DEFAULT),
     },
     session: null,
     currentPlayerIndex: 0,
@@ -60,7 +63,9 @@ export function gameReducer(state: GameEngineState, action: GameAction): GameEng
         getMaxImposters(playerCount),
       );
 
-      return { ...state, config: { ...state.config, playerCount, imposterCount } };
+      const playerNames = resizePlayerNames(state.config.playerNames, playerCount);
+
+      return { ...state, config: { ...state.config, playerCount, imposterCount, playerNames } };
     }
 
     case 'SET_IMPOSTER_COUNT': {
@@ -85,6 +90,17 @@ export function gameReducer(state: GameEngineState, action: GameAction): GameEng
       if (!isInPhase(state, GAME_PHASE.SETUP)) return state;
 
       return { ...state, config: { ...state.config, isHintEnabled: action.isHintEnabled } };
+    }
+
+    case 'SET_PLAYER_NAME': {
+      if (!isInPhase(state, GAME_PHASE.SETUP)) return state;
+      if (action.index < 0 || action.index >= state.config.playerCount) return state;
+
+      const playerNames = state.config.playerNames.map((name, index) =>
+        index === action.index ? action.name.slice(0, PLAYER_NAME_MAX_LENGTH) : name,
+      );
+
+      return { ...state, config: { ...state.config, playerNames } };
     }
 
     case 'BEGIN_HANDOFF': {

@@ -3,6 +3,7 @@
 import type { ReactNode } from 'react';
 import { useGameEngine } from '@/hooks/useGameEngine';
 import { GAME_PHASE } from '@/types/game';
+import { getPlayerName } from '@/utils/players';
 import { HandoffScreen } from './HandoffScreen';
 import { ResolutionScreen } from './ResolutionScreen';
 import { SetupForm } from './SetupForm';
@@ -29,6 +30,7 @@ export function Game({ children }: GameProps) {
             onImposterCountChange={actions.setImposterCount}
             onCategoryChange={actions.setCategory}
             onHintChange={actions.setHintEnabled}
+            onPlayerNameChange={actions.setPlayerName}
             onStart={actions.startGame}
           />
           {children}
@@ -44,12 +46,21 @@ export function Game({ children }: GameProps) {
           session={engine.session}
           playerIndex={engine.currentPlayerIndex}
           playerCount={engine.config.playerCount}
+          playerNames={engine.config.playerNames}
           onAdvance={actions.advancePlayer}
         />
       );
 
     case GAME_PHASE.INTERROGATION:
-      return <TimerScreen countdown={engine.countdown} onEndGame={actions.endGame} />;
+      if (!engine.session) return null;
+
+      return (
+        <TimerScreen
+          countdown={engine.countdown}
+          startingPlayerName={getPlayerName(engine.config.playerNames, engine.session.startingPlayerIndex)}
+          onEndGame={actions.endGame}
+        />
+      );
 
     case GAME_PHASE.RESOLUTION:
       if (!engine.session) return null;

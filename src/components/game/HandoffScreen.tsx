@@ -6,6 +6,7 @@ import { REVEAL_VIBRATION_PATTERN } from '@/data/constants';
 import { useHoldToReveal } from '@/hooks/useHoldToReveal';
 import type { GameSession } from '@/types/game';
 import { padNumber } from '@/utils/format';
+import { getPlayerName } from '@/utils/players';
 import { getRoleCard } from '@/utils/session';
 import { vibrate } from '@/utils/vibrate';
 import { NextPlayerButton } from './NextPlayerButton';
@@ -14,6 +15,7 @@ interface HandoffScreenProps {
   readonly session: GameSession;
   readonly playerIndex: number;
   readonly playerCount: number;
+  readonly playerNames: readonly string[];
   readonly onAdvance: () => void;
 }
 
@@ -21,7 +23,7 @@ interface HandoffScreenProps {
  * Rendered with `key={playerIndex}` by the parent, so per-player state (release count)
  * resets automatically for every player.
  */
-export function HandoffScreen({ session, playerIndex, playerCount, onAdvance }: HandoffScreenProps) {
+export function HandoffScreen({ session, playerIndex, playerCount, playerNames, onAdvance }: HandoffScreenProps) {
   const [releaseCount, setReleaseCount] = useState(0);
 
   const { isHeld, handlers } = useHoldToReveal({
@@ -33,13 +35,14 @@ export function HandoffScreen({ session, playerIndex, playerCount, onAdvance }: 
   const isLastPlayer = playerNumber === playerCount;
   const hasRevealed = releaseCount > 0;
   const roleCard = getRoleCard(session, playerIndex);
+  const playerName = getPlayerName(playerNames, playerIndex);
 
   return (
     <Screen
       eyebrow={`Player ${padNumber(playerNumber)} / ${padNumber(playerCount)}`}
       title={
         <>
-          Pass device to Player <span className="font-mono">{playerNumber}</span>
+          Pass device to <span className="break-words">{playerName}</span>
         </>
       }
     >

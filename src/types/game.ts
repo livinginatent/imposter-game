@@ -26,6 +26,8 @@ export interface GameConfig {
   readonly categoryId: CategorySelection;
   /** When on, imposters see a loosely related clue alongside their role. */
   readonly isHintEnabled: boolean;
+  /** One entry per player; blank entries fall back to "Player N". Always playerCount long. */
+  readonly playerNames: readonly string[];
 }
 
 /** Immutable snapshot of one round: the secret word and the shuffled role deck. */
@@ -36,6 +38,8 @@ export interface GameSession {
   readonly hint: string | null;
   /** roles[i] belongs to player i + 1. */
   readonly roles: readonly Role[];
+  /** Index of the player who opens the interrogation, picked at random each round. */
+  readonly startingPlayerIndex: number;
 }
 
 export interface GameEngineState {
