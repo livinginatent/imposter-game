@@ -2,7 +2,7 @@ import { Button } from '@/components/ui/Button';
 import { ChoiceGroup, type ChoiceOption } from '@/components/ui/ChoiceGroup';
 import { FormField } from '@/components/ui/FormField';
 import { Screen } from '@/components/ui/Screen';
-import { IMPOSTER_COUNT, PLAYER_COUNT } from '@/data/constants';
+import { IMPOSTER_COUNT, PLAYER_COUNT, PLAYER_NAME_MAX_LENGTH } from '@/data/constants';
 import { WORD_CATEGORIES } from '@/data/words';
 import { RANDOM_CATEGORY, type CategorySelection, type GameConfig } from '@/types/game';
 import { createRange } from '@/utils/range';
@@ -30,6 +30,7 @@ interface SetupFormProps {
   readonly onImposterCountChange: (count: number) => void;
   readonly onCategoryChange: (categoryId: CategorySelection) => void;
   readonly onHintChange: (isHintEnabled: boolean) => void;
+  readonly onPlayerNameChange: (index: number, name: string) => void;
   readonly onStart: () => void;
 }
 
@@ -40,6 +41,7 @@ export function SetupForm({
   onImposterCountChange,
   onCategoryChange,
   onHintChange,
+  onPlayerNameChange,
   onStart,
 }: SetupFormProps) {
   const imposterOptions: ChoiceOption<number>[] = createRange(IMPOSTER_COUNT.MIN, maxImposters).map(
@@ -60,6 +62,25 @@ export function SetupForm({
           onChange={onPlayerCountChange}
           columns={5}
         />
+      </FormField>
+
+      <FormField label="Names" aside="optional">
+        <div className="grid grid-cols-2 gap-px border border-line bg-line">
+          {config.playerNames.map((name, index) => (
+            <input
+              key={index}
+              type="text"
+              value={name}
+              onChange={(event) => onPlayerNameChange(index, event.target.value)}
+              placeholder={`Player ${index + 1}`}
+              aria-label={`Name for player ${index + 1}`}
+              maxLength={PLAYER_NAME_MAX_LENGTH}
+              autoComplete="off"
+              autoCapitalize="words"
+              className="min-w-0 bg-obsidian px-3 py-3 font-mono text-base text-ink placeholder:text-ink/40 focus-visible:relative focus-visible:outline focus-visible:outline-1 focus-visible:outline-accent sm:text-sm"
+            />
+          ))}
+        </div>
       </FormField>
 
       <FormField label="Imposters" aside={`max ${maxImposters}`}>

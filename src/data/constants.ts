@@ -18,3 +18,5 @@ export const TIMER_TICK_MS = 250;
 export const REVEAL_VIBRATION_PATTERN: number[] = [50];
 
 export const IMPOSTER_LABEL = 'IMPOSTER';
+
+export const PLAYER_NAME_MAX_LENGTH = 20;

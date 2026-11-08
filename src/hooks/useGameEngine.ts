@@ -42,6 +42,11 @@ export function useGameEngine() {
     [],
   );
 
+  const setPlayerName = useCallback(
+    (index: number, name: string) => dispatch({ type: 'SET_PLAYER_NAME', index, name }),
+    [],
+  );
+
   const startGame = useCallback(() => {
     dispatch({ type: 'BEGIN_HANDOFF', session: createGameSession(state.config) });
     resetTimer();
@@ -83,6 +88,7 @@ export function useGameEngine() {
       setImposterCount,
       setCategory,
       setHintEnabled,
+      setPlayerName,
       startGame,
       playAgain,
       advancePlayer,

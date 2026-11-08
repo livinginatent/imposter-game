@@ -37,6 +37,7 @@ export function createGameSession(
     secretWord: word,
     hint: config.isHintEnabled ? hint : null,
     roles: buildRoles(config.playerCount, config.imposterCount, random),
+    startingPlayerIndex: Math.floor(random() * config.playerCount),
   };
 }
 
